@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="form-box login">
+  <div th:if="${param.error}" >
+    <h3>You entered incorrect password</h3>
+  </div>
+  <h2>Логиннннннн</h2>
+  <form th:action="@{/login_page}" method="post" >
+    <div class="input-box">
+      <span class="icon"><ion-icon name="person-circle-outline"></ion-icon></span>
+      <input type="text" id="username" name="username" required/>
+    </div>
+    <div class="input-box">
+      <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
+      <input type="password" id="password" name="password" required/>
+    </div>
+    <button id="btn_log_2" type="submit" class="btn-light">Sign In</button>
+  </form>
+
+  <div>
+      <a href="/register"><button class="register_btn"><b>Register</b></button></a>
+  </div>
+</div>
+</body>
+</html>
+
+
+

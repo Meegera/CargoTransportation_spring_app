@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6" lang="ru"> <!--Шаблонизатор th: - берет данные из backend -->
+<head>
+    <meta charset="UTF-8">
+    <title>Система работы с сервисом грузоперевозок</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <style>
+        .b1{
+            background: #1b5569;
+            color: white;
+            border-color: #252119
+        }
+        .ch1 {
+            width: 60%; height: 60%; margin-right: auto; margin-left: auto;
+        }
+        table td, table th {
+            text-align: center;
+            padding: 8px;
+        }
+
+        .container{
+            background-color: #1b5569;
+        }
+
+        .btn-group{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .btn-group button {
+            margin-top: 5px;
+            margin-right: 5px;
+            background: #733f67;
+            font-weight: bold;
+            color: white;
+        }
+
+        .bg-image{
+            background-image: url(https://images.unsplash.com/photo-1518024291416-3244cd4a85b2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80);
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+
+        }
+
+        .container-fluid{
+            padding: 0;
+        }
+
+        .container-footer{
+            max-width: 90%;
+            margin:auto;
+        }
+        .row{
+            display: flex;
+            flex-wrap: wrap;
+        }
+        ul{
+            list-style: none; /*убирает точки в списке*/
+            padding-left: 8px;
+        }
+        .footer{
+            background-color: rgb(0,73,97);
+            padding: 2%;
+            position: relative;
+            width: 100%;
+            min-height: 100px;
+            margin-top: 7%;
+        }
+        .footer-col{
+            width: 25%;
+        }
+        .footer-col h4{
+            font-size: 18px;
+            color: #ffffff;
+            text-transform: capitalize;
+            margin-bottom: 35px;
+            font-weight: 500;
+            position: relative;
+        }
+        .footer-col h4::before{
+            content: '';
+            position: absolute;
+            left:0;
+            bottom: -10px;
+            background: rgb(255,255,255);
+            background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(59,48,56,1) 68%, rgba(59,48,56,1) 69%);
+            height: 4px;
+            box-sizing: border-box;
+            width: 80px;
+        }
+
+        .footer p{
+            margin-top: 11px;
+            margin-left: 2px;
+            color: #bbbbbb;
+            font-size: 16px;
+            font-weight: 300;
+            transition: all 0.3s ease;
+
+        }
+        .footer-col p:hover{
+            color: #ffffff;
+            padding-left: 4px;
+        }
+
+        .footer-col ul li:not(:last-child){
+            margin-bottom: 10px;
+        }
+        .footer-col .contactus{
+            font-size: 16px;
+            text-transform: capitalize;
+            text-decoration: none;
+            font-weight: 300;
+            color: #bbbbbb;
+            transition: all 0.3s ease;
+        }
+        .footer-col .contactus:hover{
+            color: #ffffff;
+            padding-left: 4px;
+        }
+        .footer-col ul li a{
+            font-size: 16px;
+            text-transform: capitalize;
+            text-decoration: none;
+            font-weight: 300;
+            color: #bbbbbb;
+            transition: all 0.3s ease;
+        }
+        .footer-col ul li a:hover{
+            color: #ffffff;
+            padding-left: 4px;
+        }
+        .footer-col .social-links a{
+            display: inline-block;
+            height: 40px;
+            width: 40px;
+            background-color: rgba(255,255,255,0.2);
+            margin:0 10px 10px 0;
+            text-align: center;
+            line-height: 40px;
+            border-radius: 50%;
+            color: #ffffff;
+            transition: all 0.5s ease;
+        }
+        .footer-col .social-links a:hover{
+            color: #24262b;
+            background-color: #ffffff;
+        }
+
+        /*для красоты при изменении ширины окна*/
+        @media(max-width: 767px){
+            .footer-col{
+                width: 50%;
+                margin-bottom: 30px;
+            }
+        }
+        @media(max-width: 574px){
+            .footer-col{
+                width: 100%;
+            }
+        }
+
+
+        .wave {
+            margin-top: 2%;
+            position: absolute;
+            top: -100px;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url("https://i.ibb.co/wQZVxxk/wave.png");
+            filter: brightness(0.47) hue-rotate(-28deg);
+            background-size: 1000px 100px;
+        }
+
+        .wave#wave1 {
+            z-index: 1000;
+            opacity: 1;
+            bottom: 0;
+            animation: animateWaves 4s linear infinite;
+        }
+
+        .wave#wave2 {
+            z-index: 999;
+            opacity: 0.5;
+            bottom: 10px;
+            animation: animate 4s linear infinite !important;
+        }
+
+        .wave#wave3 {
+            z-index: 1000;
+            opacity: 0.2;
+            bottom: 15px;
+            animation: animateWaves 3s linear infinite;
+        }
+
+        .wave#wave4 {
+            z-index: 999;
+            opacity: 0.7;
+            bottom: 20px;
+            animation: animate 3s linear infinite;
+        }
+
+        @keyframes animateWaves {
+            0% {
+                background-position-x: 1000px;
+            }
+            100% {
+                background-positon-x: 0px;
+            }
+        }
+
+
+        @keyframes animate {
+            0% {
+                background-position-x: -1000px;
+            }
+            100% {
+                background-positon-x: 0px;
+            }
+        }
+
+        .container-fluid{
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+
+        .scroll-to-top-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .popup{
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            top: 0;
+            left: 0;
+            opacity: 0;
+            visibility: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
+            transition: all 0.4s ease 0s;
+        }
+        .popup:target{
+            opacity: 1;
+            visibility: visible;
+        }
+        .popup:target .popup_content{
+            transform: perspective(600px) translate(0px, 0px) rotateX(0deg);
+            opacity: 1;
+        }
+        .popup_body{
+            min-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 10px;
+        }
+        .popup_content {
+            background-color: white;
+            color: black;
+            max-width: 800px;
+            padding: 30px;
+            position: relative;
+            border-radius: 20px; /* set the border radius to whatever you like */
+            transition: all 0.6s ease 0s;
+            opacity: 0;
+            transform: perspective(600px) translate(0px, -100%) rotateX(45deg);
+        }
+        .popup_content.blue {
+            background-image: radial-gradient(
+                    circle at top center,
+                    #1b5569,
+                    white
+            );
+            background-color: #1b5569;
+            border-color: white;
+        }
+        .popup_content.purple {
+            background-image: radial-gradient(
+                    circle at top center,
+                    #703f64,
+                    white
+            );
+            background-color: #1b5569;
+            border-color: white;
+        }
+        .popup_close{
+            position: absolute;
+            right: 10px;
+            top:10px;
+            font-size: 20px;
+            color: black;
+            text-decoration: none;
+        }
+        .popup_title{
+            font-size: 40px;
+            margin: 1em;
+            color: #733f67;
+        }
+        .popup_title.white{
+            color: white;
+        }
+        .popup_title.blue{
+            color: #1b5569;
+        }
+        .popup_title.purple{
+            color: #ffffff;
+        }
+        .popup_text.purple{
+            color: #ffffff;
+        }
+        .popup_text.blue{
+            color: #1b5569;
+        }
+        .popup_text.white{
+            color: white;
+        }
+        .popup_text{
+            font-size: 30px;
+            margin: 1em;
+            top: auto;
+            color: #733f67;
+        }
+
+    </style>
+</head>
+<body>
+<header>
+    <div class="container" style="max-width: initial;">
+        <div class="d-flex flex-wrap align-items-center justify-content-between " >
+            <!--
+            d-flex - это класс, который устанавливает для элемента свойство display: flex;, чтобы элементы внутри него могли быть выстроены в ряд с помощью flexbox
+            flex-wrap - класс для переноса элементов flex-контейнера на новую строку, если они не помещаются на одной строке
+            align-items-center - класс для вертикального выравнивания элементов flex-контейнера по центру
+            justify-content-between - класс для выравнивания элементов flex-контейнера по горизонтали. Этот класс распределяет свободное пространство между элементами таким образом, что 1 слева, остальные справа
+            -->
+            <span style="text-align: left; color: white; font-size: 30px; margin-left: 1%">Система грузоперевозок "Довезем с Божьей помощью"</span>
+
+
+            <ul class="nav col-lg-auto my-2 text-small">
+                <!--
+                nav - это класс, используемый для создания навигационных меню
+                col-lg-auto - это класс, используемый для создания колонок с автоматической шириной на больших экранах. Это означает, что ширина колонки будет рассчитана автоматически в зависимости от содержимого
+                my-2 - это класс, используемый для установки вертикальных отступов (margin) сверху и снизу элемента
+                ml-auto - это класс, который устанавливает автоматический отступ слева для элемента, чтобы выровнять его по правому краю родительского контейнера
+                -->
+
+                <li>
+                    <a href="/" class="nav-link text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-house-fill" viewBox="0 0 16 16">
+                            <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5Z"/>
+                            <path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6Z"/>
+                        </svg>
+                        Главная
+                    </a>
+                </li>
+                <li>
+                    <a href="/autoblog" class="nav-link text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-chat-heart" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M2.965 12.695a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a10.97 10.97 0 0 0 .398-2Zm-.8 3.108.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125ZM8 5.993c1.664-1.711 5.825 1.283 0 5.132-5.825-3.85-1.664-6.843 0-5.132Z"/>
+                        </svg>
+                        Autoblog
+                    </a>
+                </li>
+                <li>
+                    <a href="/login_page" class="nav-link text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-person-fill-x" viewBox="0 0 16 16">
+                            <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm-9 8c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4Z"/>
+                            <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-.646-4.854.646.647.646-.647a.5.5 0 0 1 .708.708l-.647.646.647.646a.5.5 0 0 1-.708.708l-.646-.647-.646.647a.5.5 0 0 1-.708-.708l.647-.646-.647-.646a.5.5 0 0 1 .708-.708Z"/>
+                        </svg>
+                        Выход
+                    </a>
+                </li>
+                <li class="nav-link text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-emoji-sunglasses-fill" viewBox="0 0 16 16">
+                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zM2.31 5.243A1 1 0 0 1 3.28 4H6a1 1 0 0 1 1 1v.116A4.22 4.22 0 0 1 8 5c.35 0 .69.04 1 .116V5a1 1 0 0 1 1-1h2.72a1 1 0 0 1 .97 1.243l-.311 1.242A2 2 0 0 1 11.439 8H11a2 2 0 0 1-1.994-1.839A2.99 2.99 0 0 0 8 6c-.393 0-.74.064-1.006.161A2 2 0 0 1 5 8h-.438a2 2 0 0 1-1.94-1.515L2.31 5.243zM4.969 9.75A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .866-.5z"/>
+                    </svg>
+                    <span sec:authentication="name"></span>
+                    <th:block th:with="roleName=${#authentication.getPrincipal().getAuthorities()[0].getAuthority().substring(5)}">
+                        <span th:text="${roleName}"></span>
+                    </th:block>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</header>
+<div class="bg-image">
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary btn-group" style="padding-bottom: 0">
+        <div class="container-fluid" style="display: flex;flex-direction: column;align-items: flex-end;">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav" style="flex-direction: column">
+                <button type="button" id="translateButton" class="btn b1">Перевести страницу</button>
+                <span class="navbar-nav mr-sm-2" id="google_translate_element"></span>
+            </div>
+        </div>
+    </nav>
+
+    <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+        <div class="btn-group">
+            <a href="#popup5">
+                <button type="button" class="btn b1" data-toggle="button" aria-pressed="false" autocomplete="off">Зарегестрировать пользователя</button>
+            </a>
+            <a href="#popup3">
+                <button type="button" class="btn b1" data-toggle="button" aria-pressed="false" autocomplete="off">Добавить груз</button>
+            </a>
+        </div>
+    </th:block>
+
+
+    <div class="row">
+        <div class="col-md-8 offset-md-4">
+
+            <h4 style="background: rgba(255, 255, 255, 0.4); width: 44%">Поиск груза по любому критерию:</h4>
+            <form th:action="@{/}">
+                <input type="text" name="keyword" id="keyword" size="50" th:value="${keyword}" required/>
+                <input type="submit" class="btn btn-success btn-sm b1" value="Поиск">
+                <input type="button" class="btn btn-warning btn-sm b1" value="Очистить" id="btnClear" onclick="clearSearch()"/>
+            </form>
+        </div>
+    </div>
+    <table id="1" class="table table-striped table-hover" style="background: rgba(255, 255, 255, 0.4)">
+        <thead>
+        <tr>
+            <th scope="col">ID груза</th>
+            <th scope="col">Название груза</th>
+            <th scope="col">Содержимое груза</th>
+            <th scope="col" >Город отправления</th>
+            <th scope="col">Дата отправления</th>
+            <th scope="col" >Город прибытия</th>
+            <th scope="col">Дата прибытия</th>
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <th scope="col">Действия</th>
+            </th:block>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="cargo: ${listCargo}">
+            <th scope="row" class="text-black" th:text="${cargo.id}">ID груза отсутствует</th>
+            <th scope="row" class="text-black" th:text="${cargo.name}">Название груза отсутствует</th>
+            <th scope="row" class="text-black" th:text="${cargo.cargo_contents}">Содержимое груза отсутствует</th>
+            <th scope="row" class="text-black" th:text="${cargo.city_dispatch}">Город отправления отсутствует</th>
+            <th scope="row" class="text-black" th:text="${cargo.date_dispatch}">Дата отправления отсутствует</th>
+            <th scope="row" class="text-black" th:text="${cargo.city_arrival}">Город прибытия отсутствует</th>
+            <th scope="row" class="text-black" th:text="${cargo.date_arrival}">Дата прибытия отсутствует</th>
+            <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <td>
+                    <a href="#popup1" th:data-post-id="${cargo.id}" th:data-post-name="${cargo.name}"  th:data-post-cargo_contents="${cargo.cargo_contents}"
+                       th:data-post-city_dispatch="${cargo.city_dispatch}"  th:data-post-date_dispatch="${cargo.date_dispatch}"  th:data-post-city_arrival="${cargo.city_arrival}"  th:data-post-date_arrival="${cargo.date_arrival}"  onclick="openModalEdit(this)">
+                        <button style="background-color: #d2b0ca; border-color: #1b5569" type="button" class="btn btn-info">редактировать</button>
+                    </a>
+                    <a href="#popup" th:data-post-id="${cargo.id}" onclick="openModalDelete(this)"><button style="background-color: #502446; border-color: #306e86" type="button" class="btn btn-danger">удалить</button></a>
+                </td>
+            </th:block>
+        </tr>
+        </tbody>
+    </table>
+    <button onclick="sortTableAsc()" class="b1">Сортировать по возрастанию даты поставки груза</button>
+    <button onclick="sortTableDesc()" class="b1">Сортировать по убыванию даты поставки груза</button>
+
+
+    <p class="count_table">
+        <script type="text/javascript">
+            function getRowsColumn() {
+                let table = document.getElementById("1");
+                let tBody = table.querySelector("tbody");
+                const count = tBody.querySelectorAll("tr").length;
+                document.write('<table style="margin: 0 auto; background-color: rgba(255,255,255, 0.6);"><thead><tr><th>Дата</th><th>Кол-во грузов  </th><th>Среднее кол-во грузов</th></tr></thead><tbody>');
+
+                // Получаем ссылки на ячейки столбца
+                var cells = Array.from(table.querySelectorAll("tbody th:nth-child(7)")); // массив с сылками
+                for (var j = 0; j < cells.length; j++) {
+                    cells[j] = cells[j].textContent.split(' ')[0]; // получаем массив с текстовыми значениями
+                }
+                cells.sort();
+                // Создаём объект, который будет содержать кол-во дат
+                var dateCounts = {};
+
+                for (var i = 0; i < cells.length; i++) {
+                    var datetime = cells[i];
+                    dateCounts[datetime] = (dateCounts[datetime] || 0) + 1;
+                }
+
+                // Создаем массивы с данными для гистограммы
+                var labels = Object.keys(dateCounts);
+                var data = Object.values(dateCounts);
+
+                // Создаем строки с данными для таблицы
+                for (var i = 0; i < labels.length; i++) {
+                    var dateCount = data[i];
+                    var dateAvg = Math.round(dateCount / count * 1000) / 1000;
+                    document.write('<tr><td>' + labels[i] + '</td><td>' + dateCount + '</td><td>' + dateAvg + '</td></tr>');
+                }
+
+                document.write('</tbody></table>');
+            }
+            getRowsColumn();
+
+
+        </script>
+    </p>
+
+    <p class="text-black">
+        <script type="text/javascript">
+            function getCount(){
+                let table = document.getElementById("1")
+                let tBody = table.querySelector("tbody")
+                const count = tBody.querySelectorAll("tr").length
+                document.write('<div style="text-align: center;"><span style="background-color: rgba(255, 255, 255, 0.6); padding: 3px;"><b>Количество грузоперевозок: ' + count + '</b></span></div>');
+            }
+            getCount()
+        </script>
+    </p>
+
+
+    <div style="background-color: rgba(255,255,255,0.6)" class="ch1">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <footer class="footer">
+        <div class="waves">
+            <div class="wave" id="wave1"></div>
+            <div class="wave" id="wave2"></div>
+            <div class="wave" id="wave3"></div>
+            <div class="wave" id="wave4"></div>
+        </div>
+        <div class="container-footer">
+            <div class="row">
+                <div class="footer-col">
+                    <h4>
+                        О компании
+                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
+                            <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+                        </svg>
+                    </h4>
+                    <ul>
+                        <li>
+                            <p style="text-transform: none; width: 100%; margin-left: 0">"Довезем с Божьей помощью" - компания грузоперевозок предлагает своим клиентам доставки в любые концы России по приемлемым ценам. Наш слога - "Довезем ваши вещи в ценности и сохранности"</p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-col" style="width: 21%; margin-left: 4%">
+                    <h4>Навигация</h4>
+                    <ul>
+                        <li><a href="/" style="font-size: 24px">Главная</a></li>
+                        <li><a href="/autoblog" style="font-size: 24px">Автоблог</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Связаться с нами</h4>
+                    <ul>
+                        <li><div class="contactus" style="display: flex; align-items: center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telephone" style="flex-shrink: 0;">
+                                <!--flex-shrink: 0; указывает, что элемент не должен сжиматься и должен сохранять свой исходный размер, когда доступное пространство в контейнере уменьшается-->
+                                <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"/>
+                            </svg>
+                            <p style="text-transform: none">+7 (499) 121-30-32</p>
+                        </div></li>
+                        <li><div class="contactus" style="display: flex; align-items: center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" style="vertical-align: middle; flex-shrink: 0;">
+                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
+                            </svg>
+                            <p style="text-transform: none">pi213community@gmail.com</p>
+                        </div>
+                        </li>
+                        <li><div class="contactus" style="display: flex; align-items: center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt" style="flex-shrink: 0;">
+                                <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
+                                <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                            </svg>
+                            <p style="text-transform: none">4-й Вешняковский пр.,<br>4, стр. 3, Москва</p>
+                        </div></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Где нас найти?</h4>
+                    <div class="social-links">
+                        <a href="https://ru.wikipedia.org/wiki/Проблема">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-wikipedia">
+                                <path d="M8.835 3.003c.828-.006 2.688 0 2.688 0l.033.03v.288c0 .08-.045.12-.133.12-.433.02-.522.063-.68.29-.087.126-.258.393-.435.694l-1.52 2.843-.043.089 1.858 3.801.113.031 2.926-6.946c.102-.28.086-.478-.044-.595-.132-.114-.224-.18-.563-.195l-.275-.014a.161.161 0 0 1-.096-.035.1.1 0 0 1-.046-.084v-.289l.042-.03h3.306l.034.03v.29c0 .078-.045.117-.133.117-.433.02-.754.113-.962.281a1.64 1.64 0 0 0-.488.704s-2.691 6.16-3.612 8.208c-.353.672-.7.61-1.004-.019A224.05 224.05 0 0 1 8.044 8.81c-.623 1.285-1.475 3.026-1.898 3.81-.411.715-.75.622-1.02.019-.45-1.065-1.131-2.519-1.817-3.982-.735-1.569-1.475-3.149-1.943-4.272-.167-.4-.293-.657-.412-.759-.12-.1-.368-.16-.746-.18C.069 3.429 0 3.395 0 3.341v-.303l.034-.03c.615-.003 3.594 0 3.594 0l.034.03v.288c0 .08-.05.118-.15.118l-.375.016c-.322.013-.483.11-.483.288 0 .083.034.217.109.4.72 1.753 3.207 6.998 3.207 6.998l.091.023 1.603-3.197-.32-.71L6.24 5.095s-.213-.433-.286-.577l-.098-.196c-.387-.77-.411-.82-.865-.88-.137-.017-.208-.035-.208-.102v-.304l.041-.03h2.853l.075.024v.303c0 .069-.05.104-.15.104l-.206.03c-.523.04-.438.254-.09.946l1.057 2.163 1.17-2.332c.195-.427.155-.534.074-.633-.046-.055-.202-.144-.54-.158l-.133-.015a.159.159 0 0 1-.096-.034.099.099 0 0 1-.045-.085v-.288l.041-.03Z"/>
+                            </svg>
+                        </a>
+                        <a href="https://69un.do/blog/kak-preodolet-prepyatstviya-na-puti-k-celi-7-principov-uspeha">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-globe" viewBox="0 0 16 16">
+                                <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-6.923c-.67.204-1.335.82-1.887 1.855A7.97 7.97 0 0 0 5.145 4H7.5V1.077zM4.09 4a9.267 9.267 0 0 1 .64-1.539 6.7 6.7 0 0 1 .597-.933A7.025 7.025 0 0 0 2.255 4H4.09zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a6.958 6.958 0 0 0-.656 2.5h2.49zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5H4.847zM8.5 5v2.5h2.99a12.495 12.495 0 0 0-.337-2.5H8.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5H4.51zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5H8.5zM5.145 12c.138.386.295.744.468 1.068.552 1.035 1.218 1.65 1.887 1.855V12H5.145zm.182 2.472a6.696 6.696 0 0 1-.597-.933A9.268 9.268 0 0 1 4.09 12H2.255a7.024 7.024 0 0 0 3.072 2.472zM3.82 11a13.652 13.652 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5H3.82zm6.853 3.472A7.024 7.024 0 0 0 13.745 12H11.91a9.27 9.27 0 0 1-.64 1.539 6.688 6.688 0 0 1-.597.933zM8.5 12v2.923c.67-.204 1.335-.82 1.887-1.855.173-.324.33-.682.468-1.068H8.5zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.65 13.65 0 0 1-.312 2.5zm2.802-3.5a6.959 6.959 0 0 0-.656-2.5H12.18c.174.782.282 1.623.312 2.5h2.49zM11.27 2.461c.247.464.462.98.64 1.539h1.835a7.024 7.024 0 0 0-3.072-2.472c.218.284.418.598.597.933zM10.855 4a7.966 7.966 0 0 0-.468-1.068C9.835 1.897 9.17 1.282 8.5 1.077V4h2.355z"/>
+                            </svg>
+                        </a>
+                        <a href="https://www.youtube.com/watch?v=EOOPBW33ZIw">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-youtube">
+                                <path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.007 2.007 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.007 2.007 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31.4 31.4 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.007 2.007 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A99.788 99.788 0 0 1 7.858 2h.193zM6.4 5.209v4.818l4.157-2.408L6.4 5.209z"/>
+                            </svg>
+                        </a>
+                        <a href="https://palchevsky.ru/">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-emoji-sunglasses" viewBox="0 0 16 16">
+                                <path d="M4.968 9.75a.5.5 0 1 0-.866.5A4.498 4.498 0 0 0 8 12.5a4.5 4.5 0 0 0 3.898-2.25.5.5 0 1 0-.866-.5A3.498 3.498 0 0 1 8 11.5a3.498 3.498 0 0 1-3.032-1.75zM7 5.116V5a1 1 0 0 0-1-1H3.28a1 1 0 0 0-.97 1.243l.311 1.242A2 2 0 0 0 4.561 8H5a2 2 0 0 0 1.994-1.839A2.99 2.99 0 0 1 8 6c.393 0 .74.064 1.006.161A2 2 0 0 0 11 8h.438a2 2 0 0 0 1.94-1.515l.311-1.242A1 1 0 0 0 12.72 4H10a1 1 0 0 0-1 1v.116A4.22 4.22 0 0 0 8 5c-.35 0-.69.04-1 .116z"/>
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-1 0A7 7 0 1 0 1 8a7 7 0 0 0 14 0z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <button id="scrollToTopBtn" class="scroll-to-top-btn" onclick="scrollToTop()">
+                &#8593;
+            </button>
+        </div>
+        <p style="text-align: center; color: #8baab6">&copy;2023 Team three problems | With love and respect</p>
+    </footer>
+
+    <!-- Модальные окошки -->
+    <!-- Добавление новой записи -->
+
+    <div id ="popup3" class="popup">
+        <div class="popup_body">
+            <div class="popup_content blue">
+                <a href ="#" class="popup_close"><button style="background-color: white; color: #1b5569; border-color: white" type="button" class="btn btn-danger"><strong>x</strong></button></a>
+                <div class="popup_title white"># Добавление записи</div>
+                <div class="popup_text white">Вы уверены, что хотите добавить запись?</div>
+                <div class="container1" style="display: flex; justify-content: center">
+                    <a href="#popup4">
+                        <button style="background-color: white; color: #1b5569; border-color: #194e60;" type="button" class="btn btn-info">да</button>
+                    </a>
+                    <a href ="#"><button style="background-color: #1b5569; color:white; border-color: white; margin-left: 15px" type="button" class="btn btn-danger">нет</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id ="popup4" class="popup">
+        <div class="popup_body">
+            <div class="popup_content blue">
+                <a href ="#" class="popup_close"><button style="background-color: white; border-color: #1b5569; color: #1b5569;" type="button" class="btn btn-danger"><strong>x</strong></button></a>
+                <div class="popup_title" style="color: white"><b># Добавление</b></div>
+                <div class="row">
+                    <div class="col-md-8 offset-md-4" style="margin-left: 5%; color: white">
+                        <form action="#" th:action="@{/save}" th:object="${cargo}" method="post">
+                            <table>
+                                <tr>
+                                    <td><b>ID груза</b></td>
+                                    <td><input type="text" th:field="*{id}"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Название груза</b></td>
+                                    <td><input type="text" th:field="*{name}"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Содержимое груза</b></td>
+                                    <td><input type="text" th:field="*{cargo_contents}"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Город отправления</b></td>
+                                    <td><input type="text" th:field="*{city_dispatch}"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Дата отправления</b></td>
+                                    <td><input type="date" th:field="*{date_dispatch}"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Город прибытия</b></td>
+                                    <td><input type="text" th:field="*{city_arrival}"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Дата прибытия</b></td>
+                                    <td><input type="date" th:field="*{date_arrival}"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <button type="submit" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off" style="margin-left: 5%; background-color: #1b5569; border-color: white; border-radius: 7px;">Отправить</button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Удаление записи из таблицы -->
+
+    <div id="popup" class="popup">
+        <div class="popup_body">
+            <div class="popup_content">
+                <a href="#" class="popup_close">
+                    <button style="background-color: darkred; border-color: white" type="button" class="btn btn-danger"><strong>x</strong></button>
+                </a>
+                <div class="popup_title"># Удаление записи</div>
+                <div class="popup_text">Вы уверены, что хотите удалить запись?</div>
+                <div class="container1" style="display: flex; justify-content: center">
+                    <a id="deleteLink" href="#"><button style="background-color: #d2b0ca; border-color: #502446; color: white" type="button" class="btn btn-info" onclick="deleteRecord()">да</button></a>
+                    <a href="#">
+                        <button style="background-color: #502446; border-color: #d2b0ca; margin-left: 15px" type="button" class="btn btn-danger">нет</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var cargoId;
+
+        function openModalDelete(element) {
+            cargoId = element.getAttribute('data-post-id');
+        }
+
+        function deleteRecord() {
+            var deleteLink = document.getElementById('deleteLink');
+            deleteLink.href = '/delete/' + cargoId;
+        }
+    </script>
+
+    <!-- Редактирование записи из таблицы -->
+
+    <div id="popup1" class="popup">
+        <div class="popup_body">
+            <div class="popup_content purple">
+                <a href="#" class="popup_close">
+                    <button style="background-color: darkred; border-color: white" type="button" class="btn btn-danger"><strong>x</strong></button>
+                </a>
+                <div class="popup_title purple"># Редактирование записи</div>
+                <div class="popup_text purple">Вы уверены, что хотите отредактировать запись?</div>
+                <div class="container1" style="display: flex; justify-content: center">
+                    <a href="#popup2"><button style="background-color: #d2b0ca; border-color: #814672; color: #ffffff" type="button" class="btn btn-info">да</button></a>
+                    <a href="#">
+                        <button style="background-color: #502446; border-color: #d2b0ca; margin-left: 15px" type="button" class="btn btn-danger">нет</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="popup2" class="popup">
+        <div class="popup_body">
+            <div class="popup_content">
+                <a href="#" class="popup_close">
+                    <button style="background-color: darkred; border-color: white" type="button" class="btn btn-danger"><strong>x</strong></button>
+                </a>
+                <div class="popup_title"># Редактирование записи</div>
+                <div class="row">
+                    <div class="col-md-8 offset-md-4" style="margin-left: 20%">
+                        <form th:action="@{/save}" th:object="${cargo}" method="post">
+                            <table>
+                                <tr>
+                                    <td>ID груза</td>
+                                    <td><input id="cargoIdInput" type="text" th:field="*{id}" readonly="readonly"></td>
+                                </tr>
+                                <tr>
+                                    <td>Название груза</td>
+                                    <td><input id="cargoNameInput" type="text" th:field="*{name}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Содержимое груза</td>
+                                    <td><input id="cargoCargoContentsInput" type="text" th:field="*{cargo_contents}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Город отправления</td>
+                                    <td><input id="cargoCityDispatchInput" type="text" th:field="*{city_dispatch}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Дата отправления</td>
+                                    <td><input id="cargoDateDispatchInput" type="date" th:field="*{date_dispatch}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Город прибытия</td>
+                                    <td><input id="cargoCityArrivalInput" type="text" th:field="*{city_arrival}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Дата прибытия</td>
+                                    <td><input id="cargoDateArrivalInput" type="date" th:field="*{date_arrival}"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <button type="submit" style="color: white; background: #814672; border-color: #d2b0ca;" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">Отправить</button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var data1, data2, data3, data4, data5, data6, data7;
+
+        function openModalEdit(element) {
+            data1 = element.getAttribute('data-post-id');
+            data2 = element.getAttribute('data-post-name');
+            data3 = element.getAttribute('data-post-cargo_contents');
+            data4 = element.getAttribute('data-post-city_dispatch');
+            data5 = element.getAttribute('data-post-date_dispatch');
+            data6 = element.getAttribute('data-post-city_arrival');
+            data7 = element.getAttribute('data-post-date_arrival');
+            document.getElementById('cargoIdInput').value = data1;
+            document.getElementById('cargoNameInput').value = data2;
+            document.getElementById('cargoCargoContentsInput').value = data3;
+            document.getElementById('cargoCityArrivalInput').value = data6;
+            document.getElementById('cargoDateArrivalInput').value = data7;
+            document.getElementById('cargoCityDispatchInput').value = data4;
+            document.getElementById('cargoDateDispatchInput').value = data5;
+        }
+    </script>
+
+    <!-- Добавление нового пользователя -->
+
+    <div id ="popup5" class="popup">
+        <div class="popup_body">
+            <div class="popup_content blue">
+                <a href ="#" class="popup_close"><button style="background-color: white; color: #1b5569; border-color: white" type="button" class="btn btn-danger"><strong>x</strong></button></a>
+                <div class="popup_title white"># Регистрация нового пользователя</div>
+                <div class="popup_text white">Вы уверены, что хотите зарегистрировать нового пользователя?</div>
+                <div class="container1" style="display: flex; justify-content: center">
+                    <a href="#popup6">
+                        <button style="background-color: white; color: #1b5569; border-color: #194e60;" type="button" class="btn btn-info">да</button>
+                    </a>
+                    <a href ="#"><button style="background-color: #1b5569; color:white; border-color: white; margin-left: 15px" type="button" class="btn btn-danger">нет</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id ="popup6" class="popup">
+        <div class="popup_body">
+            <div class="popup_content blue">
+                <a href ="#" class="popup_close"><button style="background-color: white; border-color: #1b5569; color: #1b5569;" type="button" class="btn btn-danger"><strong>x</strong></button></a>
+                <div class="popup_title" style="color: white"><b># Добавление</b></div>
+                <div class="popup_text" style="color: white;">Введите информацию о пользователе</div>
+                <div class="row">
+                    <div class="col-md-8 offset-md-4" style="margin-left: 30%;">
+                        <form th:action="@{/register}" method="post">
+                            <table>
+                                <tr>
+                                    <td><input type="text" id="name" name="name" placeholder="username"required/></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="password" id="password" name="password" placeholder="password"required/></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <select id="roles" name="roles" class="custom-select">
+                                            <option selected>Select Role: </option>
+                                            <option value="ROLE_USER">User</option>
+                                            <option value="ROLE_ADMIN">Administrator</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><button id="btn_register" type="submit"  style="margin-left: 5%; background-color: #1b5569; border-color: white; border-radius: 7px; color: white">Зарегистрировать</button></td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var table = document.getElementById('1');
+
+        // Получаем ссылки на ячейки столбца с датами отгрузки
+        var cells = Array.from(table.querySelectorAll("tbody th:nth-child(7)"));
+        for (var j = 0; j < cells.length; j++) {
+            cells[j] = cells[j].textContent.split(' ')[0];
+        }
+        cells.sort();
+        var dateCounts = {};
+
+        for (var i = 0; i < cells.length; i++) {
+            var datetime = cells[i];
+            dateCounts[datetime] = (dateCounts[datetime] || 0) + 1;
+        }
+
+        // Создаем массивы с данными для гистограммы
+        var labels = Object.keys(dateCounts);
+        var data = Object.values(dateCounts);
+
+        // Создаем гистограмму с помощью библиотеки Chart.js
+        var ctx = document.getElementById("myChart");
+        var chart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "",
+                    data: data,
+                    backgroundColor: "rgb(48,110,134)"
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            unit: 'day'
+                        },
+                        distribution: 'linear',
+                        ticks: {
+                            source: 'auto'
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+        function sortTableAsc() {
+            let table = document.getElementById('1');
+            let tbody = table.querySelector('tbody');
+            let rows = Array.from(tbody.querySelectorAll('tr')); /*массив всех строк из tbody*/
+
+            rows.sort((a, b) => {
+                /*Значения в ячейках извлекаются с помощью свойства textContent*/
+                let aDate = new Date(a.cells[6].textContent.trim());
+                let bDate = new Date(b.cells[6].textContent.trim());
+                return aDate - bDate;
+            });
+
+            tbody.innerHTML = ''; /*очищаем содержимое tbody*/
+            rows.forEach(row => tbody.appendChild(row)); /*добавление каждой отсортированной строки в tbody*/
+        }
+
+        function sortTableDesc() {
+            let table = document.getElementById('1');
+            let tbody = table.querySelector('tbody');
+            let rows = Array.from(tbody.querySelectorAll('tr'));
+
+            rows.sort((a, b) => {
+                let aDate = new Date(a.cells[6].textContent.trim());
+                let bDate = new Date(b.cells[6].textContent.trim());
+                return bDate - aDate;
+            });
+
+            tbody.innerHTML = '';
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Функция для плавного прокручивания страницы вверх
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Отслеживание прокрутки страницы и показ/скрытие кнопки
+        window.addEventListener('scroll', function() {
+            var scrollToTopBtn = document.getElementById('scrollToTopBtn');
+            var footer = document.querySelector('.footer');
+            var footerPosition = footer.getBoundingClientRect().top;
+
+            if (footerPosition < window.innerHeight) {
+                scrollToTopBtn.style.opacity = '1';
+            } else {
+                scrollToTopBtn.style.opacity = '0';
+            }
+        });
+    </script>
+
+</div>
+
+<script type="text/javascript">
+    function clearSearch(){
+        window.location="[[@{/}]]";
+    }
+</script>
+
+<script type="text/javascript">
+    document.getElementById('translateButton').addEventListener('click', function() {
+        var translateElement = new google.translate.TranslateElement({
+            defaultLanguage: 'ru',
+            pageLanguage: 'ru',
+            includedLanguages:'ru,en,uz,ka,tr,de,ru',
+            layout:google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay:false,
+            multilanguagePage:true},'google_translate_element')
+    });
+</script>
+
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>
